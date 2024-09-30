@@ -1,0 +1,5 @@
+
+CREATE TABLE codigos (
+	id SERIAL PRIMARY KEY,
+	valor VARCHAR(50) NOT NULL
+);
