@@ -6,8 +6,6 @@ using RabbitMQ.Client;
 using System.Text;
 
 
-Console.WriteLine(Environment.GetEnvironmentVariable("RABBITMQ_URL"));
-
 var factory = new ConnectionFactory { Uri = new Uri(Environment.GetEnvironmentVariable("RABBITMQ_URL") ?? "ERRO!!!") };
 
 var connection = factory.CreateConnection();

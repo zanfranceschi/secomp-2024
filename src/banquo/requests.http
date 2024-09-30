@@ -1,0 +1,6 @@
+@port = 5106
+
+POST http://localhost:{{port}}/
+Content-Type: application/json
+
+{"teste": 123}

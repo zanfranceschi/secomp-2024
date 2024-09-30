@@ -1,0 +1,45 @@
+services:
+  banquo:
+    image: zanfranceschi/secomp-design-01-banquo:latest
+    hostname: banquo
+    environment:
+      - DB_CONNECTION_STRING=Host=db;Username=admin;Password=123;Database=banquo
+    ports:
+      - "8080:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: "440MB"
+  db:
+    image: postgres:latest
+    hostname: db
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=banquo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: "440MB"
+
+  bacen:
+    image: zanfranceschi/secomp-design-bacen:latest
+    hostname: bacen
+    ports:
+      - "8081:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: "440MB"
+
+networks:
+  default:
+    driver: bridge
+    name: secomp-2024
