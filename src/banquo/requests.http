@@ -3,4 +3,7 @@
 POST http://localhost:{{port}}/
 Content-Type: application/json
 
-{"teste": 123}
+{
+    "clienteId": "726f6db7-2407-499b-986b-f7d6113cfdae",
+    "valor" : 100.0
+}

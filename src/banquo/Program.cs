@@ -24,8 +24,10 @@ builder.Services.AddRateLimiter(_ => _
 
 var app = builder.Build();
 
-app.MapPost("/", async (HttpClient httpClient, NpgsqlConnection conn) => 
+app.MapPost("/", async (SolicitacaoTransferenciaRequest request, HttpClient httpClient, NpgsqlConnection conn) => 
 {
+    app.Logger.LogInformation(request.ToString());
+    
     await using (conn)
     {
         await conn.OpenAsync();
@@ -33,8 +35,8 @@ app.MapPost("/", async (HttpClient httpClient, NpgsqlConnection conn) =>
         cmd.CommandText = "select 1";
         var result = await cmd.ExecuteScalarAsync();
     }
-    var response = await httpClient.PostAsJsonAsync(bacenUrl, new SolicitacaoTransferencia(Guid.NewGuid(), Guid.NewGuid(), 10M));
-    var responsePayload = await response.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponse>();
+    var response = await httpClient.PostAsJsonAsync(bacenUrl, new SolicitacaoTransferenciaRequestBacen(Guid.NewGuid(), Guid.NewGuid(), 10M));
+    var responsePayload = await response.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
     
     return Results.Created("/xpto", responsePayload);
 

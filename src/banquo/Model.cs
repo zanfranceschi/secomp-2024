@@ -1,4 +1,5 @@
+record SolicitacaoTransferenciaRequest(Guid clienteId, decimal valor);
 
-record SolicitacaoTransferencia(Guid clienteIdDe, Guid clienteIdPara, decimal valor);
+record SolicitacaoTransferenciaRequestBacen(Guid clienteIdDe, Guid clienteIdPara, decimal valor);
 
-record SolicitacaoTransferenciaResponse(Guid transferenciaId);
+record SolicitacaoTransferenciaResponseBacen(Guid transferenciaId);
