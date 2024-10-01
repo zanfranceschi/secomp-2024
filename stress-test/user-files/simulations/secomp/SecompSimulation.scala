@@ -20,24 +20,23 @@ class SecompSimulation
 
   val transferencias = scenario("Solicitação de Transferência")
     .exec {s =>
-      val clienteId = uuid()
+      val clienteIdDe = uuid()
+      val clienteIdPara = uuid()
       val valor = randomValorTransacao()
-      val payload = s"""{"valor": ${valor}, "clienteId": "${clienteId}"}"""
-      val session = s.setAll(Map("clienteId" -> clienteId, "payload" -> payload))
+      val payload = s"""{"valor": ${valor}, "clienteIdDe": "${clienteIdDe}", "clienteIdPara": "${clienteIdPara}"}"""
+      val session = s.setAll(Map("payload" -> payload))
       session
     }
     .exec(
       http("transferências")
-      .post("/").body(StringBody("#{payload}"))
+      .post("/transferencias").body(StringBody("#{payload}"))
       .header("content-type", "application/json")
       .check(status.is(201))
     )
 
   setUp(
     transferencias.inject(
-      constantUsersPerSec(2).during(10.seconds),
-      constantUsersPerSec(5).during(15.seconds),
-      rampUsersPerSec(6).to(10).during(10.seconds)
+      rampUsersPerSec(1).to(200).during(120.seconds)
     )
   ).protocols(httpProtocol)
 }

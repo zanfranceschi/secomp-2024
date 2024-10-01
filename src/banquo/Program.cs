@@ -4,6 +4,8 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.ClearProviders().AddConsole();
+
 builder.Services.AddHttpClient();
 
 builder.Services.AddNpgsqlDataSource(
@@ -24,21 +26,54 @@ builder.Services.AddRateLimiter(_ => _
 
 var app = builder.Build();
 
-app.MapPost("/", async (SolicitacaoTransferenciaRequest request, HttpClient httpClient, NpgsqlConnection conn) => 
+app.MapPost("/transferencias",
+    async (SolicitacaoTransferenciaRequest request,
+           HttpClient httpClient,
+           NpgsqlConnection conn,
+           ILogger<Api> logger) =>
 {
-    app.Logger.LogInformation(request.ToString());
-    
+    logger.LogInformation(request.ToString());
+
+    SolicitacaoTransferenciaResponse response = new SolicitacaoTransferenciaResponse { status = TransferenciaStatus.Pendente };
+
     await using (conn)
     {
         await conn.OpenAsync();
-        var cmd = conn.CreateCommand();
-        cmd.CommandText = "select 1";
-        var result = await cmd.ExecuteScalarAsync();
+        
+        var mediaTransferenciaCmd = conn.CreateCommand();
+        mediaTransferenciaCmd.CommandText = @"select coalesce(min(valor), 0) as min,
+                                                     coalesce(avg(valor), 0) as avg,
+                                                     coalesce(max(valor), 0) as max,
+                                                     coalesce(sum(valor), 0) as sum
+                                              from transferencias";
+        var mediaValorTransferencia = await mediaTransferenciaCmd.ExecuteScalarAsync();
+
+        logger.LogInformation("média de trasferência: {media}", mediaValorTransferencia);
+
+        var bacenResponse = await httpClient.PostAsJsonAsync(bacenUrl,
+            new SolicitacaoTransferenciaRequestBacen(request.clienteIdDe, request.clienteIdPara, request.valor));
+
+        SolicitacaoTransferenciaResponseBacen responsePayload = await bacenResponse.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
+        response.transferenciaId = responsePayload.transferenciaId;
+        response.status = TransferenciaStatus.Sucesso;
+
+        var persistenciaTransferenciaCmd = conn.CreateCommand();
+        persistenciaTransferenciaCmd.CommandText = "insert into transferencias (cliente_id_de, cliente_id_para, valor) values($1, $2, $3)";
+        persistenciaTransferenciaCmd.Parameters.AddWithValue(request.clienteIdDe);
+        persistenciaTransferenciaCmd.Parameters.AddWithValue(request.clienteIdPara);
+        persistenciaTransferenciaCmd.Parameters.AddWithValue(request.valor);
+        var registrosAfetados = await persistenciaTransferenciaCmd.ExecuteNonQueryAsync();
+
+        if (registrosAfetados != 1)
+            throw new Exception("Algo errado não está certo. O número de registros afetados é diferente de 1.");
     }
-    var response = await httpClient.PostAsJsonAsync(bacenUrl, new SolicitacaoTransferenciaRequestBacen(Guid.NewGuid(), Guid.NewGuid(), 10M));
-    var responsePayload = await response.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
-    
-    return Results.Created("/xpto", responsePayload);
+
+    return Results.Created($"/transferencias/${response.transferenciaId}",
+        new
+        {
+            sucesso = true,
+            href = $"/transferencias/{response.transferenciaId}"
+        });
 
 }).RequireRateLimiting("default");
 

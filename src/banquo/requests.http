@@ -1,9 +1,10 @@
 @port = 5106
 
-POST http://localhost:{{port}}/
+POST http://localhost:{{port}}/transferencias
 Content-Type: application/json
 
 {
-    "clienteId": "726f6db7-2407-499b-986b-f7d6113cfdae",
-    "valor" : 100.0
+    "clienteIdDe": "726f6db7-2407-499b-986b-f7d6113cfdae",
+    "clienteIdPara": "5c6cdc79-dd4c-4dbd-86fe-c8f8d807ad19",
+    "valor" : 30.23
 }
