@@ -39,33 +39,63 @@ app.MapPost("/transferencias",
     await using (conn)
     {
         await conn.OpenAsync();
-        
+
+        // query apenas para gerar I/O e simular computação de negócio
         var mediaTransferenciaCmd = conn.CreateCommand();
         mediaTransferenciaCmd.CommandText = @"select coalesce(min(valor), 0) as min,
                                                      coalesce(avg(valor), 0) as avg,
                                                      coalesce(max(valor), 0) as max,
                                                      coalesce(sum(valor), 0) as sum
                                               from transferencias";
-        var mediaValorTransferencia = await mediaTransferenciaCmd.ExecuteScalarAsync();
-
-        logger.LogInformation("média de trasferência: {media}", mediaValorTransferencia);
+        await using (var statsValorTransferencia = await mediaTransferenciaCmd.ExecuteReaderAsync())
+        {
+            if (statsValorTransferencia.Read())
+            {
+                logger.LogInformation("trasferências: mínima...{valor}", statsValorTransferencia.GetDecimal(0));
+                logger.LogInformation("trasferências: média....{valor}", statsValorTransferencia.GetDecimal(1));
+                logger.LogInformation("trasferências: máxima...{valor}", statsValorTransferencia.GetDecimal(2));
+                logger.LogInformation("trasferências: soma.....{valor}", statsValorTransferencia.GetDecimal(3));
+            }
+        }
 
         var bacenResponse = await httpClient.PostAsJsonAsync(bacenUrl,
-            new SolicitacaoTransferenciaRequestBacen(request.clienteIdDe, request.clienteIdPara, request.valor));
+         new SolicitacaoTransferenciaRequestBacen(request.clienteIdDe, request.clienteIdPara, request.valor));
 
         SolicitacaoTransferenciaResponseBacen responsePayload = await bacenResponse.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
         response.transferenciaId = responsePayload.transferenciaId;
         response.status = TransferenciaStatus.Sucesso;
+
+        await using var transaction = await conn.BeginTransactionAsync();
 
         var persistenciaTransferenciaCmd = conn.CreateCommand();
         persistenciaTransferenciaCmd.CommandText = "insert into transferencias (cliente_id_de, cliente_id_para, valor) values($1, $2, $3)";
         persistenciaTransferenciaCmd.Parameters.AddWithValue(request.clienteIdDe);
         persistenciaTransferenciaCmd.Parameters.AddWithValue(request.clienteIdPara);
         persistenciaTransferenciaCmd.Parameters.AddWithValue(request.valor);
-        var registrosAfetados = await persistenciaTransferenciaCmd.ExecuteNonQueryAsync();
+        var registrosAfetadosTransferencia = await persistenciaTransferenciaCmd.ExecuteNonQueryAsync();
 
-        if (registrosAfetados != 1)
-            throw new Exception("Algo errado não está certo. O número de registros afetados é diferente de 1.");
+        if (registrosAfetadosTransferencia != 1)
+            throw new Exception("Algo errado não está certo. O número de registros afetados é diferente de 1 na inserção da transferência.");
+
+        var persistenciaLedgerCmd = conn.CreateCommand();
+        persistenciaLedgerCmd.CommandText = @"insert into lancamentos_contabeis (operacao, cliente_id, debito, credito)
+                                                values ($1, $2, $3, $4), ($5, $6, $7, $8)";
+        persistenciaLedgerCmd.Parameters.AddWithValue("TRANSFERÊNCIA INTERBANCÁRIA");
+        persistenciaLedgerCmd.Parameters.AddWithValue(request.clienteIdDe);
+        persistenciaLedgerCmd.Parameters.AddWithValue(request.valor);
+        persistenciaLedgerCmd.Parameters.AddWithValue(0.0m);
+
+        persistenciaLedgerCmd.Parameters.AddWithValue("TRANSFERÊNCIA INTERBANCÁRIA");
+        persistenciaLedgerCmd.Parameters.AddWithValue(request.clienteIdPara);
+        persistenciaLedgerCmd.Parameters.AddWithValue(0.0m);
+        persistenciaLedgerCmd.Parameters.AddWithValue(request.valor);
+
+        var registrosAfetadosLedger = await persistenciaLedgerCmd.ExecuteNonQueryAsync();
+
+        if (registrosAfetadosLedger != 2)
+            throw new Exception("Algo errado não está certo. O número de registros afetados é diferente de 1 na inserção do ledger.");
+
+        await transaction.CommitAsync();
     }
 
     return Results.Created($"/transferencias/${response.transferenciaId}",
@@ -77,6 +107,6 @@ app.MapPost("/transferencias",
 
 }).RequireRateLimiting("default");
 
-app.MapGet("/", () => "ok");
+app.MapGet("/", () => "banquo ok");
 
 app.Run();

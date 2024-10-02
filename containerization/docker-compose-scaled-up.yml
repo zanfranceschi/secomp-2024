@@ -13,8 +13,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: "50MB"
+          cpus: "0.50"
+          memory: "100MB"
   db:
     image: postgres:latest
     hostname: db
@@ -29,8 +29,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.25"
-          memory: "100MB"
+          cpus: "0.50"
+          memory: "200MB"
 
   bacen:
     image: zanfranceschi/secomp-design-01-bacen:latest

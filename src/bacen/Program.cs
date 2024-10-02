@@ -6,4 +6,6 @@ app.MapPost("/transferencias", (SolicitacaoTransferencia solicitacaoTransferenci
     return Results.Ok(new { transferenciaId = Guid.NewGuid() });
 });
 
+app.MapGet("/", () => "bacen ok");
+
 app.Run();
