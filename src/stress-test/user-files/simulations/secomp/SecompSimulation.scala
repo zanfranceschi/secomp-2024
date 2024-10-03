@@ -36,7 +36,7 @@ class SecompSimulation
 
   setUp(
     transferencias.inject(
-      rampUsersPerSec(1).to(200).during(120.seconds)
+      rampUsersPerSec(1).to(300).during(120.seconds)
     )
   ).protocols(httpProtocol)
 }
