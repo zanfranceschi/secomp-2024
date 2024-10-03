@@ -17,6 +17,7 @@ class SecompSimulation
   val httpProtocol = http
     .baseUrl("http://localhost:8080")
     .userAgentHeader("Secomp - 2024")
+    .shareConnections
 
   val transferencias = scenario("Solicitação de Transferência")
     .exec {s =>
