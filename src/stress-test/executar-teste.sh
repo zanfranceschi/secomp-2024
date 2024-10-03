@@ -10,7 +10,7 @@ echo $GATLING_WORKSPACE
 
 runGatling() {
     sh $GATLING_BIN_DIR/gatling.sh -rm local -s SecompSimulation \
-        -rd "design 02 - banquo: 0.50/100MB | db: 0.50/100MB | bacen: 1.0/50MB" \
+        -rd "design 03 - banquo: 3x 0.50/100MB | db: 0.50/100MB | bacen: 1.0/50MB" \
         -rf $RESULTS_WORKSPACE \
         -sf "$GATLING_WORKSPACE/simulations"
 }
@@ -18,9 +18,9 @@ runGatling() {
 startTest() {
     for i in {1..20}; do
         # 2 requests to wake the 2 api instances up :)
-        curl --fail http://localhost:8080/ && \
+        curl --fail http://localhost:9999/ && \
         echo "" && \
-        curl --fail http://localhost:8080/ && \
+        curl --fail http://localhost:9999/ && \
         echo "" && \
         runGatling && \
         break || sleep 2;

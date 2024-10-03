@@ -15,7 +15,7 @@ class SecompSimulation
     .setScale(2, BigDecimal.RoundingMode.HALF_UP)
 
   val httpProtocol = http
-    .baseUrl("http://localhost:8080")
+    .baseUrl("http://localhost:9999")
     .userAgentHeader("Secomp - 2024")
     .shareConnections
 
