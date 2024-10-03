@@ -10,7 +10,7 @@ echo $GATLING_WORKSPACE
 
 runGatling() {
     sh $GATLING_BIN_DIR/gatling.sh -rm local -s SecompSimulation \
-        -rd "Secomp" \
+        -rd "Design 01 - banquo: 0.25/50MB, db: 0.25/50MB, bacen: 1.0/50MB" \
         -rf $RESULTS_WORKSPACE \
         -sf "$GATLING_WORKSPACE/simulations"
 }
@@ -18,15 +18,13 @@ runGatling() {
 startTest() {
     for i in {1..20}; do
         # 2 requests to wake the 2 api instances up :)
-        curl --fail http://localhost:9999/clientes/1/extrato && \
+        curl --fail http://localhost:8080/ && \
         echo "" && \
-        curl --fail http://localhost:9999/clientes/1/extrato && \
+        curl --fail http://localhost:8080/ && \
         echo "" && \
         runGatling && \
         break || sleep 2;
     done
 }
 
-#startTest
-
-runGatling
+startTest
