@@ -10,7 +10,7 @@ echo $GATLING_WORKSPACE
 
 runGatling() {
     sh $GATLING_BIN_DIR/gatling.sh -rm local -s SecompSimulation \
-        -rd "Design 02 - banquo: 0.25/50MB, db: 0.25/50MB, bacen: 1.0/50MB" \
+        -rd "design 01 - banquo: 0.25/50MB | db: 0.25/50MB | bacen: 1.0/50MB" \
         -rf $RESULTS_WORKSPACE \
         -sf "$GATLING_WORKSPACE/simulations"
 }
