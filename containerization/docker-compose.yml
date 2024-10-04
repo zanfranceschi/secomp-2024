@@ -13,6 +13,18 @@ services:
           cpus: "0.30"
           memory: "30MB"
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: "1024MB"
+
   banquo:
     image: secomp-design-01-banquo:latest
     hostname: banquo
@@ -22,6 +34,7 @@ services:
     depends_on:
       - db
       - bacen
+      - rabbitmq
     deploy:
       mode: replicated
       replicas: 3
