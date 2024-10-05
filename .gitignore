@@ -45,5 +45,5 @@ msbuild.wrn
 
 .clj-kondo
 .lsp
-src/bacen/bacen.generated.sln
-src/banquo/banquo.generated.sln
+*.sln
+
