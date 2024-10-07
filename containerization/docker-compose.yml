@@ -29,10 +29,10 @@ services:
     image: secomp-design-01-banquo:latest
     hostname: banquo
     environment:
-      - DB_CONNECTION_STRING=Host=db;Username=admin;Password=123;Database=banquo
+      - DB_CONNECTION_STRING=Host=banquo.transferencias.db;Username=admin;Password=123;Database=banquo
       - BACEN_API_URL=http://bacen:8080/transferencias
     depends_on:
-      - db
+      - banquo.transferencias.db
       - bacen
       - rabbitmq
     deploy:
@@ -42,9 +42,10 @@ services:
         limits:
           cpus: "0.50"
           memory: "100MB"
-  db:
+  
+  banquo.transferencias.db:
     image: postgres:latest
-    hostname: db
+    hostname: banquo.transferencias.db
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
