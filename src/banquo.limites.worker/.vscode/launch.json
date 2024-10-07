@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/bin/Debug/net8.0/banquo.transferencias.worker.dll",
+            "program": "${workspaceFolder}/bin/Debug/net8.0/banquo.limites.worker.dll",
             "args": [],
             "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
@@ -18,9 +18,7 @@
             "stopAtEntry": false,
             "env": {
                 "RABBITMQ_URL": "amqp://guest:guest@localhost:5672/",
-                "DB_CONNECTION_STRING": "Host=localhost;Username=admin;Password=123;Database=banquo",
-                "BACEN_API_URL": "http://localhost:5139/transferencias",
-                "LIMITES_API_URL": "http://localhost:5185/limites"
+                "DB_CONNECTION_STRING": "Host=localhost;Username=admin;Password=123;Database=banquo"
             }
         },
         {

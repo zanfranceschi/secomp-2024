@@ -1,16 +1,4 @@
-public class Configuracoes
-{
-    public Func<Guid, string> LimitesUrl { get; private set; }
-    public string BacenUrl { get; private set; }
-    public string DbConnectionString { get; private set; }
-
-    public Configuracoes(string dbConnectionString, string limitesUrl, string bacenUrl)
-    {
-        DbConnectionString = dbConnectionString;
-        BacenUrl = bacenUrl;
-        LimitesUrl = (Guid clientId) => $"{limitesUrl}/{clientId}";
-    }
-}
+public record Configuracoes(string DbConnectionString);
 
 record RealizarTransferenciaCommand(Guid transferenciaId, Guid clienteIdDe, Guid clienteIdPara, decimal valor);
 

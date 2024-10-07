@@ -13,7 +13,6 @@ public class Worker
     private readonly IModel _channel;
     private readonly EventingBasicConsumer _consumer;
     private readonly HttpClient _httpClient;
-    private readonly NpgsqlConnection _dbConnection;
     private const string COMMAND_EXCHANGE = "transferencias.realizar";
     private const string COMMAND_QUEUE = "transferencias.realizar.worker";
     private const string NOTIFICATION_EXCHANGE = "transferencias.realizada";
@@ -26,15 +25,14 @@ public class Worker
             channel.ExchangeDeclare(COMMAND_EXCHANGE, ExchangeType.Topic, true, false, null);
             channel.QueueDeclare(COMMAND_QUEUE, true, false, false, null);
             channel.QueueBind(COMMAND_QUEUE, COMMAND_EXCHANGE, "#");
-            channel.ExchangeDeclare(NOTIFICATION_EXCHANGE, ExchangeType.Topic);
+            channel.ExchangeDeclare(NOTIFICATION_EXCHANGE, ExchangeType.Topic, true, false, null);
         }
     }
 
     public Worker(ILogger<Worker> logger,
                   Configuracoes configuracoes,
                   ConnectionFactory connectionFactory,
-                  HttpClient httpClient,
-                  NpgsqlConnection dbConnection)
+                  HttpClient httpClient)
     {
         _logger = logger;
         _configuracoes = configuracoes;
@@ -42,46 +40,54 @@ public class Worker
 
         DeclararObjetosRabbitMQ(connectionFactory);
 
-        _dbConnection = dbConnection;
-
         _brokerConnection = connectionFactory.CreateConnection();
         _channel = _brokerConnection.CreateModel();
         _consumer = new EventingBasicConsumer(_channel);
+        _consumer.Received += OnMessageReceived;
+        _channel.BasicConsume(queue: COMMAND_QUEUE,
+                              autoAck: false,
+                              consumer: _consumer);
+    }
 
-        _dbConnection.Open();
+    protected async void OnMessageReceived(object? model, BasicDeliverEventArgs ea)
+    {
+        // recebe e desserializa mensagem
+        byte[] body = ea.Body.ToArray();
+        var message = Encoding.UTF8.GetString(body);
+        var cmd = JsonSerializer.Deserialize<RealizarTransferenciaCommand>(message);
 
-        _consumer.Received += async (model, ea) =>
+        // consulta limites
+        LimiteResponseBacen limiteHttpResponse = await _httpClient.GetFromJsonAsync<LimiteResponseBacen>(_configuracoes.LimitesUrl(cmd.clienteIdDe));
+        if (!limiteHttpResponse.ValorAprovado)
+            _logger.LogError("Oh, no! O lmite não foi aprovado!!! Foda-se, vou continuar mesmo assim.");
+
+        // requisita o bacen para transferência
+        var bacenHttpResponse = await _httpClient.PostAsJsonAsync(_configuracoes.BacenUrl, new SolicitacaoTransferenciaRequestBacen(cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor));
+        SolicitacaoTransferenciaResponseBacen bacenResponse = await bacenHttpResponse.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
+
+        // persiste localmente a transferência
+        using (var conn = new NpgsqlConnection(_configuracoes.DbConnectionString))
         {
-            byte[] body = ea.Body.ToArray();
-            var message = Encoding.UTF8.GetString(body);
-            var cmd = JsonSerializer.Deserialize<RealizarTransferenciaCommand>(message);
-
-            var bacenHttpResponse = await httpClient.PostAsJsonAsync(_configuracoes.bacenUrl, new SolicitacaoTransferenciaRequestBacen(cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor));
-            SolicitacaoTransferenciaResponseBacen bacenResponse = await bacenHttpResponse.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
-
-            _logger.LogInformation(bacenResponse.ToString());
-
-            var persistenciaTransferenciaCmd = _dbConnection.CreateCommand();
-            persistenciaTransferenciaCmd.CommandText = "insert into transferencias (cliente_id_de, cliente_id_para, valor) values($1, $2, $3)";
+            await conn.OpenAsync();
+            var persistenciaTransferenciaCmd = conn.CreateCommand();
+            persistenciaTransferenciaCmd.CommandText = "insert into transferencias (bacen_transferencia_id, cliente_id_de, cliente_id_para, valor) values($1, $2, $3, $4)";
+            persistenciaTransferenciaCmd.Parameters.AddWithValue(bacenResponse.transferenciaId);
             persistenciaTransferenciaCmd.Parameters.AddWithValue(cmd.clienteIdDe);
             persistenciaTransferenciaCmd.Parameters.AddWithValue(cmd.clienteIdPara);
             persistenciaTransferenciaCmd.Parameters.AddWithValue(cmd.valor);
             var registrosAfetadosTransferencia = await persistenciaTransferenciaCmd.ExecuteNonQueryAsync();
             if (registrosAfetadosTransferencia != 1)
-            {
                 _logger.LogError("Algo errado não está certo. O número de registros afetados é diferente de 1 na inserção da transferência.");
-            }
+        }
 
-            var notificacao = new TransferenciaRealizadaEvent(cmd.transferenciaId, cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor);
-            var notificaoWire = JsonSerializer.Serialize(notificacao);
-            _channel.BasicPublish(NOTIFICATION_EXCHANGE, "transferencia.realizada", null, Encoding.UTF8.GetBytes(notificaoWire));
+        // publica evento "transferência realizada"
+        var notificacao = new TransferenciaRealizadaEvent(cmd.transferenciaId, bacenResponse.transferenciaId, cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor);
+        var notificaoWire = JsonSerializer.Serialize(notificacao);
+        _channel.BasicPublish(NOTIFICATION_EXCHANGE, "transferencia.realizada", null, Encoding.UTF8.GetBytes(notificaoWire));
 
-            _channel.BasicAck(ea.DeliveryTag, false);
-        };
+        _channel.BasicAck(ea.DeliveryTag, false);
 
-        _channel.BasicConsume(queue: COMMAND_QUEUE,
-                              autoAck: false,
-                              consumer: _consumer);
+        _logger.LogInformation("mensagem processada: {mensagem}", cmd);
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
