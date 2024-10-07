@@ -20,7 +20,8 @@
                 "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
             },
             "env": {
-                "ASPNETCORE_ENVIRONMENT": "Development"
+                "ASPNETCORE_ENVIRONMENT": "Development",
+                "DB_CONNECTION_STRING": "Host=localhost;Username=admin;Password=123;Database=banquo",
             },
             "sourceFileMap": {
                 "/Views": "${workspaceFolder}/Views"
