@@ -61,8 +61,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.3"
-          memory: "30MB"
+          cpus: "0.5"
+          memory: "100MB"
 
   banquo.ledger.db:
     image: postgres:17.0
@@ -96,7 +96,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: "50MB"
+          memory: "100MB"
 
   banquo.limites.worker:
     image: banquo-limites-worker
@@ -115,8 +115,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.30"
-          memory: "30MB"
+          cpus: "0.50"
+          memory: "100MB"
 
   banquo.limites.db:
     image: postgres:17.0
@@ -151,7 +151,7 @@ services:
       resources:
         limits:
           cpus: "0.50"
-          memory: "80MB"
+          memory: "100MB"
 
   banquo.transferencias.worker:
     image: banquo-transferencias-worker
@@ -176,8 +176,8 @@ services:
       replicas: 1
       resources:
         limits:
-          cpus: "0.30"
-          memory: "30MB"
+          cpus: "0.50"
+          memory: "100MB"
 
   banquo.transferencias.db:
     image: postgres:17.0
