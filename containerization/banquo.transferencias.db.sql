@@ -5,5 +5,5 @@ CREATE TABLE transferencias (
 	cliente_id_de UUID NOT NULL,
 	cliente_id_para UUID NOT NULL,
 	valor MONEY NOT NULL,
-	realizado_em TIMESTAMP NOT NULL DEFAULT NOW()
+	realizada_em TIMESTAMP NOT NULL DEFAULT NOW()
 );

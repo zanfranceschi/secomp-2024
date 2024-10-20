@@ -10,20 +10,21 @@ echo $GATLING_WORKSPACE
 
 runGatling() {
     sh $GATLING_BIN_DIR/gatling.sh -rm local -s SecompSimulation \
-        -rd "design 03 - banquo: 3x 0.50/100MB | db: 0.50/100MB | bacen: 1.0/50MB" \
+        -rd "Design 04" \
         -rf $RESULTS_WORKSPACE \
         -sf "$GATLING_WORKSPACE/simulations"
 }
 
 startTest() {
     for i in {1..20}; do
-        # 2 requests to wake the 2 api instances up :)
-        curl --fail http://localhost:9999/ && \
-        echo "" && \
-        curl --fail http://localhost:9999/ && \
-        echo "" && \
+        # some requests to wake the api instances up :)
+        for a in {1..6}; do
+            curl --fail http://localhost:9999/ && \
+            echo "" && \
+            break || sleep 2;
+        done
         runGatling && \
-        break || sleep 2;
+        break || sleep 1;
     done
 }
 

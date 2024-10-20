@@ -6,14 +6,14 @@ using RabbitMQ.Client;
 using System.Text;
 
 
-var factory = new ConnectionFactory { Uri = new Uri(Environment.GetEnvironmentVariable("RABBITMQ_URL") ?? "ERRO!!!") };
+var factory = new ConnectionFactory { Uri = new Uri(Environment.GetEnvironmentVariable("RABBITMQ_URL")) };
 
 var connection = factory.CreateConnection();
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddNpgsqlDataSource(
-    Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? "ERRO de connection string!!!"
+    Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
 );
 
 builder.Services.AddSingleton(serviceProvider => connection.CreateModel());

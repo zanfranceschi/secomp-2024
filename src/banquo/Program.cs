@@ -9,10 +9,10 @@ builder.Logging.ClearProviders().AddConsole();
 builder.Services.AddHttpClient();
 
 builder.Services.AddNpgsqlDataSource(
-    Environment.GetEnvironmentVariable("DB_CONNECTION_STRING") ?? throw new Exception("ERRO DE CONNECTION STRING")
+    Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")
 );
 
-var bacenUrl = Environment.GetEnvironmentVariable("BACEN_API_URL") ?? throw new Exception("ERRO DE CONNECTION URL");
+var bacenUrl = Environment.GetEnvironmentVariable("BACEN_API_URL");
 
 builder.Services.AddRateLimiter(_ => _
     .AddFixedWindowLimiter("default", options =>

@@ -9,6 +9,7 @@ public class Worker
 {
     private readonly ILogger<Worker> _logger;
     private readonly Configuracoes _configuracoes;
+    private readonly NpgsqlDataSource _dbDataSource;
     private readonly IConnection _brokerConnection;
     private readonly IModel _channel;
     private readonly EventingBasicConsumer _consumer;
@@ -31,11 +32,13 @@ public class Worker
 
     public Worker(ILogger<Worker> logger,
                   Configuracoes configuracoes,
+                  NpgsqlDataSource dbDataSource,
                   ConnectionFactory connectionFactory,
                   HttpClient httpClient)
     {
         _logger = logger;
         _configuracoes = configuracoes;
+        _dbDataSource = dbDataSource;
         _httpClient = httpClient;
 
         DeclararObjetosRabbitMQ(connectionFactory);
@@ -44,6 +47,7 @@ public class Worker
         _channel = _brokerConnection.CreateModel();
         _consumer = new EventingBasicConsumer(_channel);
         _consumer.Received += OnMessageReceived;
+        _channel.BasicQos(0, 100, false);
         _channel.BasicConsume(queue: COMMAND_QUEUE,
                               autoAck: false,
                               consumer: _consumer);
@@ -51,25 +55,24 @@ public class Worker
 
     protected async void OnMessageReceived(object? model, BasicDeliverEventArgs ea)
     {
-        // recebe e desserializa mensagem
-        byte[] body = ea.Body.ToArray();
-        var message = Encoding.UTF8.GetString(body);
-        var cmd = JsonSerializer.Deserialize<RealizarTransferenciaCommand>(message);
-
-        // consulta limites
-        LimiteResponseBacen limiteHttpResponse = await _httpClient.GetFromJsonAsync<LimiteResponseBacen>(_configuracoes.LimitesUrl(cmd.clienteIdDe));
-        if (!limiteHttpResponse.ValorAprovado)
-            _logger.LogError("Oh, no! O lmite não foi aprovado!!! Foda-se, vou continuar mesmo assim.");
-
-        // requisita o bacen para transferência
-        var bacenHttpResponse = await _httpClient.PostAsJsonAsync(_configuracoes.BacenUrl, new SolicitacaoTransferenciaRequestBacen(cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor));
-        SolicitacaoTransferenciaResponseBacen bacenResponse = await bacenHttpResponse.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
-
-        // persiste localmente a transferência
-        using (var conn = new NpgsqlConnection(_configuracoes.DbConnectionString))
+        try
         {
-            await conn.OpenAsync();
-            var persistenciaTransferenciaCmd = conn.CreateCommand();
+            // recebe e desserializa mensagem
+            byte[] body = ea.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+            var cmd = JsonSerializer.Deserialize<RealizarTransferenciaCommand>(message);
+
+            // consulta limites
+            LimiteResponseBacen limiteHttpResponse = await _httpClient.GetFromJsonAsync<LimiteResponseBacen>(_configuracoes.LimitesUrl(cmd.clienteIdDe));
+            if (!limiteHttpResponse.ValorAprovado)
+                _logger.LogError("Oh, no! O lmite não foi aprovado!!! Foda-se, vou continuar mesmo assim.");
+
+            // requisita o bacen para transferência
+            var bacenHttpResponse = await _httpClient.PostAsJsonAsync(_configuracoes.BacenUrl, new SolicitacaoTransferenciaRequestBacen(cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor));
+            SolicitacaoTransferenciaResponseBacen bacenResponse = await bacenHttpResponse.Content.ReadFromJsonAsync<SolicitacaoTransferenciaResponseBacen>();
+
+            // persiste localmente a transferência
+            var persistenciaTransferenciaCmd = _dbDataSource.CreateCommand();
             persistenciaTransferenciaCmd.CommandText = "insert into transferencias (bacen_transferencia_id, cliente_id_de, cliente_id_para, valor) values($1, $2, $3, $4)";
             persistenciaTransferenciaCmd.Parameters.AddWithValue(bacenResponse.transferenciaId);
             persistenciaTransferenciaCmd.Parameters.AddWithValue(cmd.clienteIdDe);
@@ -78,16 +81,22 @@ public class Worker
             var registrosAfetadosTransferencia = await persistenciaTransferenciaCmd.ExecuteNonQueryAsync();
             if (registrosAfetadosTransferencia != 1)
                 _logger.LogError("Algo errado não está certo. O número de registros afetados é diferente de 1 na inserção da transferência.");
+
+            // publica evento "transferência realizada"
+            var notificacao = new TransferenciaRealizadaEvent(cmd.transferenciaId, bacenResponse.transferenciaId, cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor);
+            var notificaoWire = JsonSerializer.Serialize(notificacao);
+            _channel.BasicPublish(NOTIFICATION_EXCHANGE, "transferencia.realizada", null, Encoding.UTF8.GetBytes(notificaoWire));
+
+            _channel.BasicAck(ea.DeliveryTag, false);
+
+            _logger.LogInformation("mensagem processada: {mensagem}", cmd);
+
         }
-
-        // publica evento "transferência realizada"
-        var notificacao = new TransferenciaRealizadaEvent(cmd.transferenciaId, bacenResponse.transferenciaId, cmd.clienteIdDe, cmd.clienteIdPara, cmd.valor);
-        var notificaoWire = JsonSerializer.Serialize(notificacao);
-        _channel.BasicPublish(NOTIFICATION_EXCHANGE, "transferencia.realizada", null, Encoding.UTF8.GetBytes(notificaoWire));
-
-        _channel.BasicAck(ea.DeliveryTag, false);
-
-        _logger.LogInformation("mensagem processada: {mensagem}", cmd);
+        catch (Exception ex)
+        {
+            _channel.BasicNack(ea.DeliveryTag, false, true);
+            _logger.LogError(ex, "Erro ao processar mensagem");
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

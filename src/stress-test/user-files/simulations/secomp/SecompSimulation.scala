@@ -32,12 +32,12 @@ class SecompSimulation
       http("transferências")
       .post("/transferencias").body(StringBody("#{payload}"))
       .header("content-type", "application/json")
-      .check(status.is(201))
+      .check(status.in(200, 201, 202))
     )
 
   setUp(
     transferencias.inject(
-      rampUsersPerSec(1).to(300).during(120.seconds)
+      rampUsersPerSec(1).to(1000).during(5.minutes)
     )
   ).protocols(httpProtocol)
 }

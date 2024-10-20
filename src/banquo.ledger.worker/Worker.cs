@@ -7,7 +7,7 @@ using System.Text.Json;
 public class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-    private readonly Configuracoes _configuracoes;
+    private readonly NpgsqlDataSource _dbDataSource;
     private readonly IConnection _brokerConnection;
     private readonly IModel _channel;
     private readonly EventingBasicConsumer _consumer;
@@ -26,11 +26,11 @@ public class Worker : BackgroundService
     }
 
     public Worker(ILogger<Worker> logger,
-                  Configuracoes configuracoes,
+                  NpgsqlDataSource dbDataSource,
                   ConnectionFactory connectionFactory)
     {
         _logger = logger;
-        _configuracoes = configuracoes;
+        _dbDataSource = dbDataSource;
 
         DeclararObjetosRabbitMQ(connectionFactory);
 
@@ -45,38 +45,40 @@ public class Worker : BackgroundService
 
     protected async void OnMessageReceived(object? model, BasicDeliverEventArgs ea)
     {
-        // recebe e desserializa mensagem
-        byte[] body = ea.Body.ToArray();
-        var message = Encoding.UTF8.GetString(body);
-        var evento = JsonSerializer.Deserialize<TransferenciaRealizadaEvent>(message);
-
-        // persiste localmente a transferência realizada
-        using (var conn = new NpgsqlConnection(_configuracoes.DbConnectionString))
+        try
         {
-            await conn.OpenAsync();
-            
-            var persistenciaLedgerCmd = conn.CreateCommand();
-        persistenciaLedgerCmd.CommandText = @"insert into lancamentos_contabeis (operacao, cliente_id, debito, credito)
+            // recebe e desserializa mensagem
+            byte[] body = ea.Body.ToArray();
+            var message = Encoding.UTF8.GetString(body);
+            var evento = JsonSerializer.Deserialize<TransferenciaRealizadaEvent>(message);
+
+            // persiste localmente a transferência realizada
+            var persistenciaLedgerCmd = _dbDataSource.CreateCommand();
+            persistenciaLedgerCmd.CommandText = @"insert into lancamentos_contabeis (operacao, cliente_id, debito, credito)
                                                 values ($1, $2, $3, $4), ($5, $6, $7, $8)";
-        persistenciaLedgerCmd.Parameters.AddWithValue("TRANSFERÊNCIA INTERBANCÁRIA");
-        persistenciaLedgerCmd.Parameters.AddWithValue(evento.clienteIdDe);
-        persistenciaLedgerCmd.Parameters.AddWithValue(evento.valor);
-        persistenciaLedgerCmd.Parameters.AddWithValue(0.0m);
+            persistenciaLedgerCmd.Parameters.AddWithValue("TRANSFERÊNCIA INTERBANCÁRIA");
+            persistenciaLedgerCmd.Parameters.AddWithValue(evento.clienteIdDe);
+            persistenciaLedgerCmd.Parameters.AddWithValue(evento.valor);
+            persistenciaLedgerCmd.Parameters.AddWithValue(0.0m);
 
-        persistenciaLedgerCmd.Parameters.AddWithValue("TRANSFERÊNCIA INTERBANCÁRIA");
-        persistenciaLedgerCmd.Parameters.AddWithValue(evento.clienteIdPara);
-        persistenciaLedgerCmd.Parameters.AddWithValue(0.0m);
-        persistenciaLedgerCmd.Parameters.AddWithValue(evento.valor);
+            persistenciaLedgerCmd.Parameters.AddWithValue("TRANSFERÊNCIA INTERBANCÁRIA");
+            persistenciaLedgerCmd.Parameters.AddWithValue(evento.clienteIdPara);
+            persistenciaLedgerCmd.Parameters.AddWithValue(0.0m);
+            persistenciaLedgerCmd.Parameters.AddWithValue(evento.valor);
 
-        var registrosAfetadosLedger = await persistenciaLedgerCmd.ExecuteNonQueryAsync();
+            var registrosAfetadosLedger = await persistenciaLedgerCmd.ExecuteNonQueryAsync();
 
-        if (registrosAfetadosLedger != 2)
-            throw new Exception("Algo errado não está certo. O número de registros afetados é diferente de 1 na inserção do ledger.");
+            if (registrosAfetadosLedger != 2)
+                throw new Exception("Algo errado não está certo. O número de registros afetados é diferente de 1 na inserção do ledger.");
+
+            _channel.BasicAck(ea.DeliveryTag, false);
+            _logger.LogInformation("mensagem processada: {mensagem}", evento);
         }
-
-        _channel.BasicAck(ea.DeliveryTag, false);
-
-        _logger.LogInformation("mensagem processada: {mensagem}", evento);
+        catch (Exception ex)
+        {
+            _channel.BasicNack(ea.DeliveryTag, false, true);
+            _logger.LogError(ex, "Erro ao processar mensagem");
+        }
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
