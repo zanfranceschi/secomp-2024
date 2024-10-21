@@ -11,8 +11,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.30"
-          memory: "50MB"
+          cpus: "0.50"
+          memory: "100MB"
 
   banquo:
     image: banquo
