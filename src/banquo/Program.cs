@@ -124,19 +124,17 @@ app.MapPost("/transferencias",
         await conn.OpenAsync();
         await consultarLimites(logger, conn);
         await realizarTransferenciaBacen(response, request, httpClient);
-        await using (var transaction = await conn.BeginTransactionAsync())
+        await using var transaction = await conn.BeginTransactionAsync();
+        try
         {
-            try
-            {
-                await persistirTransferencia(conn, request);
-                await persitirRegistrosLedger(conn, request);
-                await transaction.CommitAsync();    
-            }
-            catch
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
+            await persistirTransferencia(conn, request);
+            await persitirRegistrosLedger(conn, request);
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
     }
 
