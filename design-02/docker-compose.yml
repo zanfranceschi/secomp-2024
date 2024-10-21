@@ -1,0 +1,52 @@
+services:
+  banquo:
+    image: banquo
+    hostname: banquo
+    environment:
+      - DB_CONNECTION_STRING=Host=db;Username=admin;Password=123;Database=banquo
+      - BACEN_API_URL=http://bacen:8080/transferencias
+    ports:
+      - "9999:8080"
+    depends_on:
+      - db
+      - bacen
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "200MB"
+  db:
+    image: postgres:17.0
+    hostname: db
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=banquo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "200MB"
+
+  bacen:
+    image: bacen
+    hostname: bacen
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "100MB"
+
+networks:
+  default:
+    driver: bridge
+    name: secomp-2024
