@@ -6,7 +6,7 @@ project.lock.json
 nupkg/
 
 # Visual Studio Code
-.vscode/
+#.vscode/
 
 # Rider
 .idea/
@@ -41,3 +41,9 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+
+
+.clj-kondo
+.lsp
+*.sln
+

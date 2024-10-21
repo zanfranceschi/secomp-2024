@@ -1,0 +1,7 @@
+// local development
+@port = 5185
+
+// docker
+// @port = 8080
+
+GET http://localhost:{{port}}/limites/e276bdd7-aeda-4589-8e48-86b28d15d61d
