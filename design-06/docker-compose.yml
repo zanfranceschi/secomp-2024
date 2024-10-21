@@ -1,0 +1,203 @@
+services:
+  nginx:
+    image: nginx:1.27.2
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - banquo.transferencias.api
+    ports:
+      - "9999:9999"
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: "50MB"
+
+  rabbitmq:
+    image: rabbitmq:4.0.2-management
+    hostname: rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    restart: on-failure
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 5s
+      timeout: 30s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: "500MB"
+
+  bacen:
+    image: bacen
+    hostname: bacen
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "100MB"
+
+  banquo.ledger.worker:
+    image: banquo-ledger-worker
+    hostname: banquo.ledger.worker
+    environment:
+      - DB_CONNECTION_STRING=Host=banquo.ledger.db;Username=admin;Password=123;Database=ledger;Maximum Pool Size=20
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      banquo.ledger.db:
+        condition: service_started
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "50MB"
+
+  banquo.ledger.db:
+    image: postgres:17.0
+    hostname: banquo.ledger.db
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=ledger
+    ports:
+      - "54321:5432"
+    volumes:
+      - ./banquo.ledger.db.sql:/docker-entrypoint-initdb.d/banquo.ledger.db.sql
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "100MB"
+
+  banquo.limites.api:
+    image: banquo-limites-api
+    hostname: banquo.limites.api
+    environment:
+      - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=20
+    depends_on:
+      - banquo.limites.db
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.3"
+          memory: "50MB"
+
+  banquo.limites.worker:
+    image: banquo-limites-worker
+    hostname: banquo.limites.worker
+    environment:
+      - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=20
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      banquo.limites.db:
+        condition: service_started
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: "50MB"
+
+  banquo.limites.db:
+    image: postgres:17.0
+    hostname: banquo.limites.db
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=limites
+    ports:
+      - "54322:5432"
+    volumes:
+      - ./banquo.limites.db.sql:/docker-entrypoint-initdb.d/banquo.limites.db.sql
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: "200MB"
+
+  banquo.transferencias.api:
+    image: banquo-transferencias-api
+    hostname: banquo.transferencias.api
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 3
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: "100MB"
+
+  banquo.transferencias.worker:
+    image: banquo-transferencias-worker
+    hostname: banquo.transferencias.worker
+    environment:
+      - DB_CONNECTION_STRING=Host=banquo.transferencias.db;Username=admin;Password=123;Database=transferencias;Maximum Pool Size=20
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - BACEN_API_URL=http://bacen:8080/transferencias
+      - LIMITES_API_URL=http://banquo.limites.api:8080/limites
+    depends_on:
+      banquo.transferencias.db:
+        condition: service_started
+      bacen:
+        condition: service_started
+      banquo.limites.api:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: "50MB"
+
+  banquo.transferencias.db:
+    image: postgres:17.0
+    hostname: banquo.transferencias.db
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=transferencias
+    ports:
+      - "54323:5432"
+    volumes:
+      - ./banquo.transferencias.db.sql:/docker-entrypoint-initdb.d/banquo.transferencias.db.sql
+    restart: on-failure
+    deploy:
+      resources:
+        limits:
+          cpus: "0.30"
+          memory: "50MB"
+
+networks:
+  default:
+    driver: bridge
+    name: secomp-2024
