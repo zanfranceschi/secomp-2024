@@ -9,13 +9,16 @@ services:
       - "9999:8080"
     depends_on:
       - db
-      - bacen
     restart: on-failure
+    networks:
+      - default
+      - bacen
     deploy:
       resources:
         limits:
           cpus: "1.0"
           memory: "200MB"
+
   db:
     image: postgres:17.0
     hostname: db
@@ -34,19 +37,8 @@ services:
           cpus: "1.0"
           memory: "200MB"
 
-  bacen:
-    image: bacen
-    hostname: bacen
-    restart: on-failure
-    deploy:
-      mode: replicated
-      replicas: 2
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "100MB"
-
 networks:
   default:
     driver: bridge
-    name: secomp-2024
+  bacen:
+    external: true
