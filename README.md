@@ -1,9 +1,11 @@
 # Escalabilidade: Uma Demonstração Prática
 ## SECOMP XII / 2024
 
-Repositório com o código fonte da apresentação para SECOMP XII realizada no dia 01/11/2024 na UFSCar.
+**Repositório com o código fonte e todos artefatos da apresentação para SECOMP XII realizada no dia 01/11/2024 na UFSCar.**
 
 ## Organização do Repositório
+
+### Diretórios
 
 [./bacen](./bacen)
 Artefatos para executar a API Bacen.
@@ -29,3 +31,42 @@ Artefatos para executar o cenário extra 06.
 [./docker](./docker)
 Contém script para construir todas as imagens docker.
 
+[./src](./src)
+Diretório com o código fonte dos serviços usados nos cenários. A linguagem de programação usada foi C# com o framework dotnet8.
+
+[./stress-test](./stress-test)
+Contém o código fonte para execução do cenário de teste de stress.
+
+### Arquivos
+
+[diagramas.drawio](./diagramas.drawio)
+Contém todos os diagramas usados nos [slides](./SECOMP-2024-slides.pdf). Pode ser aberto com o programa [draw.io](https://app.diagrams.net/) diretamente do browser.
+
+[SECOMP-2024-slides.pdf](./SECOMP-2024-slides.pdf)
+Slides da apresentação em formato PDF.
+
+## Tecnologias e Ferramentas Usadas
+
+https://www.docker.com/ - conteinerização
+
+https://docs.docker.com/compose/ - ferramenta para execução de múltiplos contêineres integrados
+
+https://nginx.org/ - load balancer
+
+https://www.postgresql.org/ - banco de dados relacional
+
+https://www.rabbitmq.com/ - message broker
+
+https://dotnet.microsoft.com/ - plataforma de desenvolvimento
+
+https://learn.microsoft.com/dotnet/csharp/ - linguagem de programação
+
+https://code.visualstudio.com/ - editor de código multiplataforma
+
+https://gatling.io/ - ferramenta de teste de performance
+
+https://workspace.google.com/products/slides/ - ferramenta usada para apresentação de slides
+
+https://github.com/ - ferramenta para versionamento de arquivos através do git
+
+https://nixos.org/ - sistema operacional usado na apresentação e confecção de todos os artefatos da apresentação
