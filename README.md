@@ -51,7 +51,7 @@ https://www.docker.com/ - conteinerização
 
 https://docs.docker.com/compose/ - ferramenta para execução de múltiplos contêineres integrados
 
-https://nginx.org/ - load balancer
+https://nginx.org/ - balanceador de carga*
 
 https://www.postgresql.org/ - banco de dados relacional
 
@@ -70,3 +70,6 @@ https://workspace.google.com/products/slides/ - ferramenta usada para apresenta�
 https://github.com/ - ferramenta para versionamento de arquivos através do git
 
 https://nixos.org/ - sistema operacional usado na apresentação e confecção de todos os artefatos da apresentação
+
+
+\* *Disclaimer: O nginx foi usado de proxy reverso e não para balanceamento de carga HTTP. O balanceamento de carga de fato foi feito através de uma técnica chamada [DNS Load Balancing](https://www.cloudflare.com/pt-br/learning/performance/what-is-dns-load-balancing/) usando o [DNS do docker](https://docs.docker.com/engine/network/#dns-services).*
