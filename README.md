@@ -73,3 +73,16 @@ https://nixos.org/ - sistema operacional usado na apresentação e confecção d
 
 
 \* *Disclaimer: O nginx foi usado de proxy reverso e não para balanceamento de carga HTTP. O balanceamento de carga de fato foi feito através de uma técnica chamada [DNS Load Balancing](https://www.cloudflare.com/pt-br/learning/performance/what-is-dns-load-balancing/) usando o [DNS do docker](https://docs.docker.com/engine/network/#dns-services).*
+
+
+## Contato / Redes Sociais
+
+Se quiser se conectar ou entrar em contato comigo, me encontre nas redes sociais:
+
+- https://github.com/zanfranceschi
+- https://bsky.app/profile/zanfranceschi.bsky.social
+- https://www.linkedin.com/in/francisco-zanfranceschi/
+- https://www.youtube.com/@zanfranceschi
+- https://www.instagram.com/zanfranceschi/
+- https://dev.to/zanfranceschi
+- https://twitter.com/zanfranceschi
