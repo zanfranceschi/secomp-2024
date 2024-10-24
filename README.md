@@ -55,6 +55,8 @@ https://workspace.google.com/products/slides/ - ferramenta usada para apresenta�
 
 https://github.com/ - ferramenta para versionamento de arquivos através do git
 
+https://app.diagrams.net/ - ferramenta para desenhar diagramas
+
 https://nixos.org/ - sistema operacional usado na apresentação e confecção de todos os artefatos da apresentação
 
 
