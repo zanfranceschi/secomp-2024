@@ -60,7 +60,7 @@ https://app.diagrams.net/ - ferramenta para desenhar diagramas
 https://nixos.org/ - sistema operacional usado na apresentação e confecção de todos os artefatos da apresentação
 
 
-\* *Disclaimer: O nginx foi usado de proxy reverso e não para balanceamento de carga HTTP. O balanceamento de carga de fato foi feito através de uma técnica chamada [DNS Load Balancing](https://www.cloudflare.com/pt-br/learning/performance/what-is-dns-load-balancing/) usando o [DNS do docker](https://docs.docker.com/engine/network/#dns-services).*
+\* *O nginx foi usado de proxy reverso e não para balanceamento de carga HTTP. O balanceamento de carga de fato foi feito através de uma técnica chamada [DNS Load Balancing](https://www.cloudflare.com/pt-br/learning/performance/what-is-dns-load-balancing/) usando o [DNS do docker](https://docs.docker.com/engine/network/#dns-services).*
 
 
 ## Contato / Redes Sociais
