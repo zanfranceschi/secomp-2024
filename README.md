@@ -1,7 +1,7 @@
 # Escalabilidade: Uma Demonstração Prática
 ## SECOMP XII / 2024
 
-**Repositório com o código fonte e artefatos da apresentação para SECOMP XII realizada no dia 01/11/2024 na UFSCar.**
+**Repositório com o código fonte e artefatos da apresentação para SECOMP XII realizada em 01/11/2024 na UFSCar.**
 
 ## Organização do Repositório
 
