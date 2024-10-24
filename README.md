@@ -7,35 +7,25 @@
 
 ### Diretórios
 
-[./bacen](./bacen)
-Artefatos para executar a API Bacen.
+[./bacen](./bacen) - Artefatos para executar a API Bacen.
 
-[./design-01](./design-01)
-Artefatos para executar o cenário 01.
+[./design-01](./design-01) - Artefatos para executar o cenário 01.
 
-[./design-02](./design-02)
-Artefatos para executar o cenário 02.
+[./design-02](./design-02) - Artefatos para executar o cenário 02.
 
-[./design-03](./design-03)
-Artefatos para executar o cenário 03.
+[./design-03](./design-03) - Artefatos para executar o cenário 03.
 
-[./design-04](./design-04)
-Artefatos para executar o cenário 04.
+[./design-04](./design-04) - Artefatos para executar o cenário 04.
 
-[./design-05](./design-05)
-Artefatos para executar o cenário 05.
+[./design-05](./design-05) - Artefatos para executar o cenário 05.
 
-[./design-06](./design-06)
-Artefatos para executar o cenário extra 06.
+[./design-06](./design-06) - Artefatos para executar o cenário extra 06.
 
-[./docker](./docker)
-Contém script para construir todas as imagens docker.
+[./docker](./docker) - Contém script para construir todas as imagens docker.
 
-[./src](./src)
-Diretório com o código fonte dos serviços usados nos cenários. A linguagem de programação usada foi C# com o framework dotnet8.
+[./src](./src) - Diretório com o código fonte dos serviços usados nos cenários. A linguagem de programação usada foi C# com o framework dotnet8.
 
-[./stress-test](./stress-test)
-Contém o código fonte para execução do cenário de teste de stress.
+[./stress-test](./stress-test) - Contém o código fonte para execução do cenário de teste de stress.
 
 ### Arquivos
 
