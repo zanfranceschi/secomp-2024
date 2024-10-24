@@ -5,7 +5,7 @@
 
 ## Organização do Repositório
 
-### Diretórios
+### Diretórios e Arquivos
 
 [./bacen](./bacen) - Artefatos para executar a API Bacen.
 
@@ -27,13 +27,9 @@
 
 [./stress-test](./stress-test) - Contém o código fonte para execução do cenário de teste de stress.
 
-### Arquivos
+[diagramas.drawio](./diagramas.drawio) - Contém todos os diagramas usados nos [slides](./SECOMP-2024-slides.pdf). Pode ser aberto com o programa [draw.io](https://app.diagrams.net/) diretamente do browser.
 
-[diagramas.drawio](./diagramas.drawio)
-Contém todos os diagramas usados nos [slides](./SECOMP-2024-slides.pdf). Pode ser aberto com o programa [draw.io](https://app.diagrams.net/) diretamente do browser.
-
-[SECOMP-2024-slides.pdf](./SECOMP-2024-slides.pdf)
-Slides da apresentação em formato PDF.
+[SECOMP-2024-slides.pdf](./SECOMP-2024-slides.pdf) - Slides da apresentação em formato PDF.
 
 ## Tecnologias e Ferramentas Usadas
 
