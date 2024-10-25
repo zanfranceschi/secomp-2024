@@ -1,5 +1,5 @@
 services:
-  nginx:
+  load.balancer:
     image: nginx:1.27.2
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -11,8 +11,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "0.50"
-          memory: "100MB"
+          cpus: "0.30"
+          memory: "50MB"
 
   banquo:
     image: banquo
@@ -28,11 +28,11 @@ services:
       - bacen
     deploy:
       mode: replicated
-      replicas: 5
+      replicas: 2
       resources:
         limits:
-          cpus: "1.0"
-          memory: "200MB"
+          cpus: "0.5"
+          memory: "100MB"
 
   db:
     image: postgres:17.0
@@ -49,8 +49,8 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.5"
-          memory: "1024MB"
+          cpus: "0.5"
+          memory: "100MB"
 
 networks:
   default:

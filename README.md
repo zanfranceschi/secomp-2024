@@ -7,19 +7,19 @@
 
 ### Diretórios e Arquivos
 
+[./arq01-cenario01](./arq01-cenario01) - Artefatos para executar o cenário 01 da arquitetura 01.
+
+[./arq01-cenario02](./arq01-cenario02) - Artefatos para executar o cenário 02 da arquitetura 01.
+
+[./arq02-cenario01](./arq02-cenario01) - Artefatos para executar o cenário 01 da arquitetura 02.
+
+[./arq02-cenario02](./arq02-cenario02) - Artefatos para executar o cenário 02 da arquitetura 02.
+
+[./arq03-cenario01](./arq03-cenario01) - Artefatos para executar o cenário 01 da arquitetura 03.
+
+[./arq03-cenario02](./arq03-cenario02) - Artefatos para executar o cenário 02 da arquitetura 03.
+
 [./bacen](./bacen) - Artefatos para executar a API Bacen.
-
-[./design-01](./design-01) - Artefatos para executar o cenário 01.
-
-[./design-02](./design-02) - Artefatos para executar o cenário 02.
-
-[./design-03](./design-03) - Artefatos para executar o cenário 03.
-
-[./design-04](./design-04) - Artefatos para executar o cenário 04.
-
-[./design-05](./design-05) - Artefatos para executar o cenário 05.
-
-[./design-06](./design-06) - Artefatos para executar o cenário extra 06.
 
 [./docker](./docker) - Contém script para construir todas as imagens docker.
 
@@ -51,13 +51,7 @@ https://code.visualstudio.com/ - editor de código multiplataforma
 
 https://gatling.io/ - ferramenta de teste de performance
 
-https://workspace.google.com/products/slides/ - ferramenta usada para apresentação de slides
-
-https://github.com/ - ferramenta para versionamento de arquivos através do git
-
 https://app.diagrams.net/ - ferramenta para desenhar diagramas
-
-https://nixos.org/ - sistema operacional usado na apresentação e confecção de todos os artefatos da apresentação
 
 
 \* *O nginx foi usado de proxy reverso e não para balanceamento de carga HTTP. O balanceamento de carga de fato foi feito através de uma técnica chamada [DNS Load Balancing](https://www.cloudflare.com/pt-br/learning/performance/what-is-dns-load-balancing/) usando o [DNS do docker](https://docs.docker.com/engine/network/#dns-services).*
@@ -74,3 +68,10 @@ Se quiser se conectar ou entrar em contato comigo, me encontre nas redes sociais
 - https://www.instagram.com/zanfranceschi/
 - https://dev.to/zanfranceschi
 - https://twitter.com/zanfranceschi
+
+
+### Rinha de Backend:
+- https://bsky.app/profile/rinhadebackend.bsky.social
+- https://twitter.com/rinhadebackend
+- https://www.youtube.com/results?search_query=rinha+de+backend
+- https://www.google.com/search?q=rinha+de+backend
