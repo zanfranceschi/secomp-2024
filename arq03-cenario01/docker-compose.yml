@@ -1,5 +1,5 @@
 services:
-  nginx:
+  load.balancer:
     image: nginx:1.27.2
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -14,7 +14,7 @@ services:
           cpus: "0.30"
           memory: "50MB"
 
-  rabbitmq:
+  message.broker:
     image: rabbitmq:4.0.2-management
     hostname: rabbitmq
     ports:
@@ -32,18 +32,6 @@ services:
           cpus: "1.5"
           memory: "500MB"
 
-  bacen:
-    image: bacen
-    hostname: bacen
-    restart: on-failure
-    deploy:
-      mode: replicated
-      replicas: 2
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "100MB"
-
   banquo.ledger.worker:
     image: banquo-ledger-worker
     hostname: banquo.ledger.worker
@@ -51,7 +39,7 @@ services:
       - DB_CONNECTION_STRING=Host=banquo.ledger.db;Username=admin;Password=123;Database=ledger;Maximum Pool Size=20
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
-      rabbitmq:
+      message.broker:
         condition: service_healthy
       banquo.ledger.db:
         condition: service_started
@@ -105,7 +93,7 @@ services:
       - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=20
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
-      rabbitmq:
+      message.broker:
         condition: service_healthy
       banquo.limites.db:
         condition: service_started
@@ -142,7 +130,7 @@ services:
     environment:
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
-      rabbitmq:
+      message.broker:
         condition: service_healthy
     restart: on-failure
     deploy:
@@ -164,13 +152,14 @@ services:
     depends_on:
       banquo.transferencias.db:
         condition: service_started
-      bacen:
-        condition: service_started
       banquo.limites.api:
         condition: service_started
-      rabbitmq:
+      message.broker:
         condition: service_healthy
     restart: on-failure
+    networks:
+      - default
+      - bacen
     deploy:
       mode: replicated
       replicas: 1
@@ -200,4 +189,5 @@ services:
 networks:
   default:
     driver: bridge
-    name: secomp-2024
+  bacen:
+    external: true

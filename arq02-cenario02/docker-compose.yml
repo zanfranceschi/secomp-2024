@@ -1,5 +1,5 @@
 services:
-  nginx:
+  load.balancer:
     image: nginx:1.27.2
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
@@ -22,15 +22,18 @@ services:
       - BACEN_API_URL=http://bacen:8080/transferencias
     depends_on:
       - db
-      - bacen
     restart: on-failure
+    networks:
+      - default
+      - bacen
     deploy:
       mode: replicated
-      replicas: 5
+      replicas: 3
       resources:
         limits:
-          cpus: "1.0"
-          memory: "200MB"
+          cpus: "0.5"
+          memory: "100MB"
+
   db:
     image: postgres:17.0
     hostname: db
@@ -46,22 +49,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.5"
-          memory: "1024MB"
-
-  bacen:
-    image: bacen
-    hostname: bacen
-    restart: on-failure
-    deploy:
-      mode: replicated
-      replicas: 2
-      resources:
-        limits:
-          cpus: "0.5"
-          memory: "100MB"
+          cpus: "1.5"
+          memory: "500MB"
 
 networks:
   default:
     driver: bridge
-    name: secomp-2024
+  bacen:
+    external: true

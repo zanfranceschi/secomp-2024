@@ -1,0 +1,17 @@
+services:
+  bacen:
+    image: bacen
+    hostname: bacen
+    restart: on-failure
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "100MB"
+
+networks:
+  default:
+    driver: bridge
+    name: bacen
