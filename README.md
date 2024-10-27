@@ -25,7 +25,9 @@
 
 [./src](./src) - Diretório com o código fonte dos serviços usados nos cenários. A linguagem de programação usada foi C# com o framework dotnet8.
 
-[./stress-test](./stress-test) - Contém o código fonte para execução do cenário de teste de stress.
+[./stress-test-gatling](./stress-test-gatling) - Contém o código fonte para execução do cenário de teste de stress usando a ferramenta Gatling.
+
+[./stress-test-k6](./stress-test-k6) - Contém o código fonte para execução do cenário de teste de stress usando a ferramenta Grafana K6.
 
 [diagramas.drawio](./diagramas.drawio) - Contém todos os diagramas usados nos [slides](./SECOMP-2024-slides.pdf). Pode ser aberto com o programa [draw.io](https://app.diagrams.net/) diretamente do browser.
 
@@ -50,6 +52,8 @@ https://learn.microsoft.com/dotnet/csharp/ - linguagem de programação
 https://code.visualstudio.com/ - editor de código multiplataforma
 
 https://gatling.io/ - ferramenta de teste de performance
+
+https://k6.io/ - ferramenta de teste de performance usada na apresentação
 
 https://app.diagrams.net/ - ferramenta para desenhar diagramas
 
