@@ -53,7 +53,7 @@ https://code.visualstudio.com/ - editor de código multiplataforma
 
 https://gatling.io/ - ferramenta de teste de performance
 
-https://k6.io/ - ferramenta de teste de performance usada na apresentação
+https://k6.io/ - ferramenta de teste de performance
 
 https://app.diagrams.net/ - ferramenta para desenhar diagramas
 
