@@ -42,7 +42,7 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_DB=banquo
     ports:
-      - "5432:5432"
+      - "15432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: on-failure
