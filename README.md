@@ -79,3 +79,4 @@ Se quiser se conectar ou entrar em contato comigo, me encontre nas redes sociais
 - https://twitter.com/rinhadebackend
 - https://www.youtube.com/results?search_query=rinha+de+backend
 - https://www.google.com/search?q=rinha+de+backend
+ 
