@@ -7,12 +7,10 @@ export const options = {
     discardResponseBodies: true,
     scenarios: {
         banquo: {
-            executor: 'ramping-vus',
-            startVUs: 1,
-            gracefulRampDown: '0s',
-            stages: [
-                { target: 1000, duration: '5m' },
-            ],
+            executor: 'externally-controlled',
+            duration: '1h',
+            vus: 0,
+            maxVUs: 1000,
         },
     },
 };

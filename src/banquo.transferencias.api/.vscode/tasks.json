@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/banquo.transferencias.api.generated.sln",
+                "${workspaceFolder}/banquo.transferencias.api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/banquo.transferencias.api.generated.sln",
+                "${workspaceFolder}/banquo.transferencias.api.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/banquo.transferencias.api.generated.sln"
+                "${workspaceFolder}/banquo.transferencias.api.csproj"
             ],
             "problemMatcher": "$msCompile"
         }
