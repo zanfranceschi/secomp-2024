@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# script pra buildar imagens das aplicações em `src` 
+# script pra buildar todas as imagens das aplicações localizadas no diretório `src` – necessário para rodar os testes
 
 root_dir=$(pwd)
 
