@@ -30,9 +30,9 @@ services:
       mode: replicated
       replicas: 3
       resources:
-        limits: # média
-          cpus: "0.5"
-          memory: "100MB"
+        limits: # grande
+          cpus: "1.0"
+          memory: "200MB"
 
   db:
     image: postgres:17.0
