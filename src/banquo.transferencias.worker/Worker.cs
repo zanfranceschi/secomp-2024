@@ -47,7 +47,7 @@ public class Worker
         _channel = _brokerConnection.CreateModel();
         _consumer = new EventingBasicConsumer(_channel);
         _consumer.Received += OnMessageReceived;
-        _channel.BasicQos(0, 100, false);
+        _channel.BasicQos(0, 1, false);
         _channel.BasicConsume(queue: COMMAND_QUEUE,
                               autoAck: false,
                               consumer: _consumer);

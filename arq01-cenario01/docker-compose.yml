@@ -15,7 +15,7 @@ services:
       - bacen
     deploy:
       resources:
-        limits:
+        limits: # pequena
           cpus: "0.3"
           memory: "50MB"
 
@@ -26,14 +26,12 @@ services:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
       - POSTGRES_DB=banquo
-    ports:
-      - "15432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: on-failure
     deploy:
       resources:
-        limits:
+        limits: # pequena
           cpus: "0.3"
           memory: "50MB"
 

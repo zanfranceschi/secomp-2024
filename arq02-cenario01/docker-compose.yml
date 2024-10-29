@@ -10,8 +10,8 @@ services:
     restart: on-failure
     deploy:
       resources:
-        limits:
-          cpus: "0.30"
+        limits: # pequena
+          cpus: "0.3"
           memory: "50MB"
 
   banquo:
@@ -30,7 +30,7 @@ services:
       mode: replicated
       replicas: 2
       resources:
-        limits:
+        limits: # média
           cpus: "0.5"
           memory: "100MB"
 
@@ -41,14 +41,12 @@ services:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
       - POSTGRES_DB=banquo
-    ports:
-      - "15432:5432"
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: on-failure
     deploy:
       resources:
-        limits:
+        limits: # média
           cpus: "0.5"
           memory: "100MB"
 

@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/banquo.ledger.worker.generated.sln",
+                "${workspaceFolder}/banquo.ledger.worker.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/banquo.ledger.worker.generated.sln",
+                "${workspaceFolder}/banquo.ledger.worker.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/banquo.ledger.worker.generated.sln"
+                "${workspaceFolder}/banquo.ledger.worker.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

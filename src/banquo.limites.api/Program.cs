@@ -19,19 +19,18 @@ app.MapGet("/limites/{clienteId}", async (
         {
             await conn.OpenAsync();
 
-            // query apenas para gerar algum I/O e ficar propositalmente um pouco lento
+            /*
+                Query para gerar I/O e processamento no banco para
+                ficar propositalmente lento simulando alguma regra
+                pesada de negócio.
+            */
             var statsTransferenciaCmd = conn.CreateCommand();
             statsTransferenciaCmd.CommandText = @"select coalesce(min(valor::decimal), .0) as min,
                                                          coalesce(avg(valor::decimal), .0) as avg,
                                                          coalesce(max(valor::decimal), .0) as max,
                                                          coalesce(sum(valor::decimal), .0) as sum
-                                                  from transferencias where realizada_em between $1 and $2;";
-            var agora = DateTime.Now;
-            var _10segundosAtras = agora.AddSeconds(-10);
-            var _20segundosAtras = agora.AddSeconds(-20);
-            statsTransferenciaCmd.Parameters.AddWithValue(_10segundosAtras);
-            statsTransferenciaCmd.Parameters.AddWithValue(_20segundosAtras);
-
+                                                  from transferencias";
+            
             await using var statsValorTransferencia = await statsTransferenciaCmd.ExecuteReaderAsync();
 
             if (statsValorTransferencia.Read())

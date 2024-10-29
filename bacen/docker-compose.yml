@@ -7,7 +7,7 @@ services:
       mode: replicated
       replicas: 2
       resources:
-        limits:
+        limits: # média
           cpus: "0.5"
           memory: "100MB"
 

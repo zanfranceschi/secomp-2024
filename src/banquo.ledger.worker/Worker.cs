@@ -38,6 +38,7 @@ public class Worker : BackgroundService
         _channel = _brokerConnection.CreateModel();
         _consumer = new EventingBasicConsumer(_channel);
         _consumer.Received += OnMessageReceived;
+        _channel.BasicQos(0, 1, false);
         _channel.BasicConsume(queue: NOTIFICATION_QUEUE,
                               autoAck: false,
                               consumer: _consumer);

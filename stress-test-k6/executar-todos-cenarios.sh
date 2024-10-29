@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # script para rodar todos os cenários automaticamente
+# subir bacen e timescaledb antes de executar esse script
 
 iniciarTeste() {
 
@@ -28,18 +29,7 @@ iniciarTeste() {
     echo "Teste ${2} finalizado"
 }
 
-# k6 timescaledb / grafana
-pushd ./k6-realtime-results
-    docker compose up -d
-popd
-
-# k6 timescaledb / grafana
-pushd ../bacen
-    docker compose up -d
-    sleep 5
-popd
-
-brave "http://localhost:3000/d/d5b60252-63b6-409f-9b17-a967db8e01f2/secomp-apresentacao?orgId=1&refresh=5s&viewPanel=2"
+brave "http://localhost:3000"
 
 iniciarTeste "../arq01-cenario01" "ARQ01-CENARIO01"
 iniciarTeste "../arq01-cenario02" "ARQ01-CENARIO02"

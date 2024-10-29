@@ -11,8 +11,7 @@ export const options = {
             startVUs: 1,
             gracefulRampDown: '0s',
             stages: [
-                { target: 10, duration: '10s' },   // warmup
-                { target: 600, duration: '170s' }, // teste
+                { target: 1000, duration: '5m' },
             ],
         },
     },

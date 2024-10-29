@@ -10,8 +10,8 @@ services:
     restart: on-failure
     deploy:
       resources:
-        limits:
-          cpus: "0.30"
+        limits: # pequena
+          cpus: "0.3"
           memory: "50MB"
 
   message.broker:
@@ -28,9 +28,9 @@ services:
       retries: 10
     deploy:
       resources:
-        limits:
-          cpus: "1.5"
-          memory: "500MB"
+        limits: # grande
+          cpus: "1.0"
+          memory: "200MB"
 
   banquo.ledger.worker:
     image: banquo-ledger-worker
@@ -48,7 +48,7 @@ services:
       mode: replicated
       replicas: 1
       resources:
-        limits:
+        limits: # pequena
           cpus: "0.3"
           memory: "50MB"
 
@@ -59,22 +59,20 @@ services:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
       - POSTGRES_DB=ledger
-    ports:
-      - "54321:5432"
     volumes:
       - ./banquo.ledger.db.sql:/docker-entrypoint-initdb.d/banquo.ledger.db.sql
     restart: on-failure
     deploy:
       resources:
-        limits:
-          cpus: "0.50"
-          memory: "100MB"
+        limits: # pequena
+          cpus: "0.3"
+          memory: "50MB"
 
   banquo.limites.api:
     image: banquo-limites-api
     hostname: banquo.limites.api
     environment:
-      - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=20
+      - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=10
     depends_on:
       - banquo.limites.db
     restart: on-failure
@@ -82,7 +80,7 @@ services:
       mode: replicated
       replicas: 2
       resources:
-        limits:
+        limits: # pequena
           cpus: "0.3"
           memory: "50MB"
 
@@ -90,7 +88,7 @@ services:
     image: banquo-limites-worker
     hostname: banquo.limites.worker
     environment:
-      - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=20
+      - DB_CONNECTION_STRING=Host=banquo.limites.db;Username=admin;Password=123;Database=limites;Maximum Pool Size=10
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
       message.broker:
@@ -102,8 +100,8 @@ services:
       mode: replicated
       replicas: 1
       resources:
-        limits:
-          cpus: "0.30"
+        limits: # pequena
+          cpus: "0.3"
           memory: "50MB"
 
   banquo.limites.db:
@@ -113,16 +111,14 @@ services:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
       - POSTGRES_DB=limites
-    ports:
-      - "54322:5432"
     volumes:
       - ./banquo.limites.db.sql:/docker-entrypoint-initdb.d/banquo.limites.db.sql
     restart: on-failure
     deploy:
       resources:
-        limits:
-          cpus: "1.0"
-          memory: "200MB"
+        limits: # pequena
+          cpus: "0.3"
+          memory: "50MB"
 
   banquo.transferencias.api:
     image: banquo-transferencias-api
@@ -137,9 +133,9 @@ services:
       mode: replicated
       replicas: 3
       resources:
-        limits:
-          cpus: "0.50"
-          memory: "100MB"
+        limits: # pequena
+          cpus: "0.3"
+          memory: "50MB"
 
   banquo.transferencias.worker:
     image: banquo-transferencias-worker
@@ -164,8 +160,8 @@ services:
       mode: replicated
       replicas: 1
       resources:
-        limits:
-          cpus: "0.30"
+        limits: # pequena
+          cpus: "0.3"
           memory: "50MB"
 
   banquo.transferencias.db:
@@ -175,15 +171,13 @@ services:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin
       - POSTGRES_DB=transferencias
-    ports:
-      - "54323:5432"
     volumes:
       - ./banquo.transferencias.db.sql:/docker-entrypoint-initdb.d/banquo.transferencias.db.sql
     restart: on-failure
     deploy:
       resources:
-        limits:
-          cpus: "0.30"
+        limits: # pequena
+          cpus: "0.3"
           memory: "50MB"
 
 networks:

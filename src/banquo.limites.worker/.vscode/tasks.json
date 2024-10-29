@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/banquo.limites.worker.generated.sln",
+                "${workspaceFolder}/banquo.limites.worker.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/banquo.limites.worker.generated.sln",
+                "${workspaceFolder}/banquo.limites.worker.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary;ForceNoAlign"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/banquo.limites.worker.generated.sln"
+                "${workspaceFolder}/banquo.limites.worker.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

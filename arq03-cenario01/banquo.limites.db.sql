@@ -7,6 +7,3 @@ CREATE TABLE transferencias (
 	valor MONEY NOT NULL,
 	realizada_em TIMESTAMP NOT NULL DEFAULT NOW()
 );
-
-CREATE INDEX transferencias_idx_realizada_em
-ON transferencias(realizada_em);
