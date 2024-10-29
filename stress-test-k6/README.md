@@ -36,7 +36,8 @@ Para rodar o teste no linux/mac com emissão de métricas para o timescaledb/gra
 ```
 O arquivo [stress-test-realtime-results.sh](./stress-test-realtime-results.sh) contém o script acima para facilitar a execução do teste.
 
-### pequenareparo
+### preparo
+
 Antes de executar o teste, é necessário, subir os contêineres para capturar/acompanhar as métricas declarados em [./k6-realtime-results](./k6-realtime-results) via `docker compose up`. Para acessar o Grafana, vá para [http://localhost:3000](http://localhost:3000) após os contêineres terem iniciado.
 
 ## Execução Simples sem Métricas
